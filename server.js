@@ -14,8 +14,18 @@ const server = net.createServer((client) => {
     client.id = Date.now() +"_seed"+ ++seed;
     client.logger = fs.createWriteStream(`client${client.id}.txt`);
     client.dir = DIR+client.id+path.sep;
+    connections++;
+        if(connections > MAX_CONNECTIONS){
+            console.log("----Too mach users----");
+            send_response(client, 'DEC');
+            client.destroy();
+            connections--;
+        }
+        else
+        {
+
+        }
     client.on('data', (data)=>{
-        check_connection_pool(client);
         my_writer(client, 'Client:'+data);
         if(data === 'FILES') {
             fs.mkdir(client.dir, ()=>{});
@@ -35,14 +45,10 @@ const server = net.createServer((client) => {
 
 server.listen(port, () => {
     console.log(`Server listening on localhost:${port}`);
+    console.log('======================================');
 });
 
-function check_connection_pool(client){
-    if(connections+1>MAX_CONNECTIONS){
-        send_response(client, 'There are too much users!!!');
-        client.destroy();
-    }
-}
+
 
 function write_file(client, data) {
      let parts = data.split('FILE');
