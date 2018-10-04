@@ -21,12 +21,9 @@ const server = net.createServer((client) => {
             client.destroy();
             connections--;
         }
-        else
-        {
-
-        }
+        
     client.on('data', (data)=>{
-        my_writer(client, 'Client:'+data);
+        writeLog(client, 'Client:'+data);
         if(data === 'FILES') {
             fs.mkdir(client.dir, ()=>{});
             send_response(client, 'ACK');
@@ -39,7 +36,7 @@ const server = net.createServer((client) => {
     });
     client.on('end', () => {
         connections--;
-        my_writer(client, `Client №${client.id} disconnected`);
+        writeLog(client, `Client №${client.id} disconnected`);
     });
 });
 
@@ -47,8 +44,6 @@ server.listen(port, () => {
     console.log(`Server listening on localhost:${port}`);
     console.log('======================================');
 });
-
-
 
 function write_file(client, data) {
      let parts = data.split('FILE');
@@ -58,11 +53,11 @@ function write_file(client, data) {
 }
 
 function send_response(client, message){
-    my_writer(client, 'You: ' + message);
+    writeLog(client, 'You: ' + message);
     client.write(message);
 }
 
-function my_writer(client, message){
+function writeLog(client, message){
     client.logger.write(message+'\n');
     console.log( message);
 }
